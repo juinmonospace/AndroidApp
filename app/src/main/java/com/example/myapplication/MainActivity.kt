@@ -4,13 +4,11 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.icu.number.NumberFormatter.UnitWidth
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,7 +19,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowColumn
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -38,20 +35,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
@@ -59,12 +51,12 @@ import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlin.random.Random
+import android.location.Geocoder
+import java.util.Locale
 
 
 class MainActivity : ComponentActivity() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    //private lateinit var tvLatitude: TextView
-    //private lateinit var tvLongitude: TextView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +67,7 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf("")
             }
             val (longitude, setLongitude) = remember { mutableStateOf("") }
+            val (address, setAddress) = remember { mutableStateOf("") }
 
             MyApplicationTheme {
                 // A surface container using the 'background' color from the theme
@@ -88,27 +81,25 @@ class MainActivity : ComponentActivity() {
                     Column(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.Start
                     ) {
                         //display data from gps
                         Text("Latitude: $latitude")
                         Text("Longitude: $longitude")
+                        //Text("Address: $address")
                     }
                 }
             }
 
                     fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this@MainActivity)
 
-            /*
-                    getCurrentLocation{
-                        location ->
-                        setLatitude(location.latitude.toString())
-                        setLongitude(location.longitude.toString())
-                    }
-            */
+
             checkAndRequestPermissions(setLatitude, setLongitude)
+            //getAddressLocation(latitude.toDouble(), longitude.toDouble(), setAddress)
         }
     }
+
+
 
     private fun checkAndRequestPermissions(
         setLatitude: (String) -> Unit,
@@ -127,7 +118,7 @@ class MainActivity : ComponentActivity() {
             }
         }
         else{
-            requestPermission()
+            requestLocationPermission()
         }
     }
 
@@ -137,7 +128,7 @@ class MainActivity : ComponentActivity() {
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
 
-    private fun requestPermission(){
+    private fun requestLocationPermission(){
         ActivityCompat.requestPermissions(
             this, arrayOf(
                 android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -169,13 +160,6 @@ class MainActivity : ComponentActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
         ) != PackageManager.PERMISSION_GRANTED
             ) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
             return
         }
         fusedLocationProviderClient.lastLocation
@@ -189,91 +173,36 @@ class MainActivity : ComponentActivity() {
 
 
     }
+
+    //private fun getCurrentTime()
+
+    // get address (city, country) based on current location
+    fun getAddressLocation( latitude: Double, longitude: Double,setAddress: (String) -> Unit){
+        val geocoderLocation = GeocoderLocation(this@MainActivity)
+        val locationInfo = geocoderLocation.getAddress(latitude, longitude)
+        setAddress(locationInfo)
+    }
 }
 
-/*
-private fun getCurrentLocation(){
-
-
-    if (checkPermissions()){
-        if (isLocationEnabled()){
-            fusedLocationProviderClient.lastLocation.addOnCompleteListener(this){
-                task -> val location:Location? = task.result
-                if(location == null){
-                    Toast.makeText(this, "Null Received", Toast.LENGTH_SHORT).show()
-                }
-                else{
-                    Toast.makeText(this, "Get Success", Toast.LENGTH_SHORT).show()
-                    tvLatitude.text = ""+location.latitude
-                    tvLongitude.text= ""+location.longitude
-                }
+class GeocoderLocation(private val context: Context) {
+    fun getAddress(latitude: Double, longitude: Double): String {
+        val geocoder = Geocoder(context, Locale.getDefault())
+        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+        if (addresses != null) {
+            return if (addresses.isNotEmpty()) {
+                val address = addresses[0]
+                val city = address.locality ?: ""
+                val country = address.countryName ?: ""
+                "$city, $country"
+            } else {
+                "No location found"
             }
         }
-        else{
-            //setting open
-            Toast.makeText(this, "Turn on location", Toast.LENGTH_SHORT).show()
-            val intent  =Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-            startActiviy(intent)
-        }
-    }
-    else{
-        //request permission
-        requestPermission()
-    }
-
-}
-private fun isLocationEnabledL Boolean(){
-    val locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-        LocationManager.NETWORK_PROVIDER
-    )
-}
-private fun requestPermission(){
-    ActivityCompat.requestPermissions(
-        this, arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION,
-        android.Manifest.permission.ACCESS_FINE_LOCATION),
-    PERMISSION_REQUEST_ACCESS_LOCATION
-    )
-}
-private fun checkPermissions(): Boolean{
-    if (ActivityCompat.checkSelfPermission( this,
-        android.Manifest.permission.ACCESS_COARSE_LOCATION)
-        == PackageManager.PERMISSION_GRANTED
-        && ActivityCompat.checkSelfPermission(this,
-            android.Manifest.permission.ACCESS_FINE_LOCATION) ==
-        PackageManager.PERMISSION_GRANTED) {
-        return true
-    }
-    return false
-}
-
-*/
-
-
-/*
-@Composable
-fun ApiTest(){
-    val apiCall = ApiCall()
-    //ApiCall.getData(this){ dataModel ->
-        //Callback function, invoked when API response is received
-    apiCall.getSomeData(context = LocalContext.current){
-        dataModel ->
-        val text = dataModel.value
-
-    }
-}*/
-
-/*
-@Composable
-fun PostList(posts: List<Post>){
-    LazyColumn {
-        items(posts) {
-            post ->
-            Text(text = post.title)
-        }
+        return "No location found."
     }
 }
-*/
+
+
 
 @Composable
 fun Start(){
@@ -339,12 +268,7 @@ fun TextCell(text: String, modifier: Modifier = Modifier){
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MainScreen() {
-    /*
-    Row(modifier = Modifier.padding(5.dp)){
-        TextCell(text = "1", modifier = Modifier.weight(0.25f, fill = true))
-        TextCell(text = "1", modifier = Modifier.weight(0.25f, fill = true))
-        TextCell(text = "1", modifier = Modifier.weight(0.25f, fill = true))
-    }*/
+
     val items = (1..12).map{
         ItemProperties(
             color = Color(
@@ -385,7 +309,7 @@ data class ItemProperties(
 @Composable
 fun GreetingPreview() {
     MyApplicationTheme {
-        Start()
-        //MainScreen()
+        //Start()
+
     }
 }
