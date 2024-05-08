@@ -76,4 +76,18 @@ dependencies {
 
     //FLOW DEMO
     implementation("androidx.compose.foundation:foundation:1.5.0")
+
+    //navigation
+    val nav_version = "2.7.7"
+
+    implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
+    implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
+
+    implementation("androidx.core:core-ktx:1.6.0")
+    implementation("androidx.appcompat:appcompat:1.3.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
+    implementation("androidx.activity:activity-compose:1.4.0")
+    implementation("androidx.navigation:navigation-compose:2.4.0-alpha10")
+
+    implementation("com.google.android.gms:play-services-location:21.2.0")
 }

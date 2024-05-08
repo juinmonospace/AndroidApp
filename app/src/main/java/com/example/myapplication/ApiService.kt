@@ -6,7 +6,8 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface ApiService {
-    @GET("posts/{id}")
+    @GET("posts")
+    //suspend fun getPosts(): List<Post>
     fun getData(): Call<DataModel> //TODO: define datamodel
     
     val retrofit: Retrofit
