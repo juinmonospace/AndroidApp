@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -22,37 +24,39 @@ import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.myapplication.ui.theme.MyApplicationTheme
-import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
+import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import kotlin.random.Random
-import android.location.Geocoder
+import java.util.Calendar
 import java.util.Locale
+import java.text.SimpleDateFormat
+import java.util.Date
+import kotlin.random.Random
 
 
 class MainActivity : ComponentActivity() {
@@ -86,7 +90,17 @@ class MainActivity : ComponentActivity() {
                         //display data from gps
                         Text("Latitude: $latitude")
                         Text("Longitude: $longitude")
+                        Text(getTimeAndDate())
                         //Text("Address: $address")
+                        if (latitude != null){
+                            Button(
+                                onClick = { /*TODO*/ }, // navigate to new page/write note
+                                modifier = Modifier.padding(16.dp),
+                                shape = CircleShape
+                            ){
+                                Text("Make diary entry")
+                            }
+                        }
                     }
                 }
             }
@@ -99,7 +113,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
+// Get current date and time to display
+    private fun getTimeAndDate(): String{
+        val currentDate = SimpleDateFormat("'Date: 'dd-MM-yyyy '\nTime: 'HH:mm:ss z")
+        val currentDateAndTime = currentDate.format(Date())
+        return currentDateAndTime.toString()
+    }
 
     private fun checkAndRequestPermissions(
         setLatitude: (String) -> Unit,
@@ -174,7 +193,6 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    //private fun getCurrentTime()
 
     // get address (city, country) based on current location
     fun getAddressLocation( latitude: Double, longitude: Double,setAddress: (String) -> Unit){
