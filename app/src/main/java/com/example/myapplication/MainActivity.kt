@@ -4,16 +4,23 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import android.widget.Button
+import android.widget.ImageView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +41,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,14 +58,24 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberImagePainter
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import java.io.File
 import java.util.Calendar
 import java.util.Locale
 import java.text.SimpleDateFormat
 import java.util.Date
-import kotlin.random.Random
+import java.util.Objects
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 
 class MainActivity : ComponentActivity() {
@@ -94,12 +113,27 @@ class MainActivity : ComponentActivity() {
                         //Text("Address: $address")
                         if (latitude != null){
                             Button(
-                                onClick = { /*TODO*/ }, // navigate to new page/write note
+                                onClick = { /* TODO */ }, // navigate to new page/write note
                                 modifier = Modifier.padding(16.dp),
                                 shape = CircleShape
                             ){
                                 Text("Make diary entry")
                             }
+
+                            if (shouldShowCamera.value){
+                                CameraView(outputDirectory = outputDirectory,
+                                    executor = cameraExecutor,
+                                    onImageCaptured = ::handleImageCapture,
+                                    onError = {Log.e("kilo", "View error:", it)}
+                            }
+                            requestCameraPermission()
+                            outputDirectory = getOutputDirectory()
+                            cameraExecutor = Executors.newSingleThreadExecutor()
+                            if (shouldShowCamera.value){
+                                Image(painter = rememberImagePainter(phototUri),
+                                    contentDescription = null,)
+                            }
+
                         }
                     }
                 }
@@ -112,6 +146,7 @@ class MainActivity : ComponentActivity() {
             //getAddressLocation(latitude.toDouble(), longitude.toDouble(), setAddress)
         }
     }
+
 
 // Get current date and time to display
     private fun getTimeAndDate(): String{
@@ -189,8 +224,6 @@ class MainActivity : ComponentActivity() {
                 exception ->
                 Log.e("MainActivity", "Error getting location", exception)
             }
-
-
     }
 
 
@@ -200,6 +233,62 @@ class MainActivity : ComponentActivity() {
         val locationInfo = geocoderLocation.getAddress(latitude, longitude)
         setAddress(locationInfo)
     }
+}
+
+private val requestPermissionLauncher = registerForActivityResult(
+    ActivityResultContracts.RequestPermission()
+) { isGranted ->
+    if (isGranted) {
+        Log.i("kilo", "Permission granted")
+        shouldShowCamera.value = true
+    } else {
+        Log.i("kilo", "Permission denied")
+    }
+}
+private fun requestCameraPermission() {
+    when {
+        ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED -> {
+            Log.i("kilo", "Permission previously granted")
+            shouldShowCamera.value = true
+        }
+
+        ActivityCompat.shouldShowRequestPermissionRationale(
+            this,
+            Manifest.permission.CAMERA
+        ) -> Log.i("kilo", "Show camera permissions dialog")
+
+        else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+    }
+}
+
+private lateinit var outputDirectory: File
+private lateinit var cameraExecutor: ExecutorService
+private lateinit var photoUri: Uri
+private var shouldShowPhoto: MutableState<Boolean> = mutableStateOf(false)
+private var shouldShowCamera: MutableState<Boolean> = mutableStateOf(false)
+
+
+fun handleImageCapture(uri: Uri) {
+    Log.i("kilo", "Image captured: $uri")
+    shouldShowCamera.value = false
+    photoUri = uri
+    shouldShowPhoto.value = true
+}
+
+private fun getOutputDirectory(): File {
+    val mediaDir = externalMediaDirs.firstOrNull()?.let {
+        File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
+    }
+
+    return if (mediaDir != null && mediaDir.exists()) mediaDir else filesDir
+}
+
+override fun onDestroy() {
+    super.onDestroy()
+    cameraExecutor.shutdown()
 }
 
 class GeocoderLocation(private val context: Context) {
@@ -220,108 +309,6 @@ class GeocoderLocation(private val context: Context) {
     }
 }
 
-
-
-@Composable
-fun Start(){
-    var headerText by remember {
-        mutableStateOf("Choose a dish to start!")
-    }
-    var entryText by remember {
-        mutableStateOf("Entree")
-    }
-    var mainText by remember {
-        mutableStateOf("Main")
-    }
-    var dessertText by remember {
-        mutableStateOf("Dessert")
-    }
-
-        Column {
-            Text(text = headerText,
-                modifier = Modifier.padding(16.dp),
-                textAlign = TextAlign.Center)
-            Row {
-                Button(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier.padding(16.dp),
-                    shape = CircleShape
-                )
-                    {
-                        Text(entryText)
-                    }
-
-                Button(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier.padding(16.dp),
-                    shape = CircleShape)
-                    {
-                      Text(mainText)
-                    }
-                Button(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier.padding(16.dp),
-                    shape = CircleShape,
-                    ) {
-                    Text(dessertText)
-                }
-            }
-        }
-
-}
-
-@Composable
-fun TextCell(text: String, modifier: Modifier = Modifier){
-    val cellModifier = Modifier
-        .padding(4.dp)
-        .size(100.dp, 100.dp)
-        .border(width = 4.dp, color = Color.Black)
-    Text(text = text,
-        cellModifier.then(modifier),
-        fontSize = 70.sp,
-        fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Center)
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun MainScreen() {
-
-    val items = (1..12).map{
-        ItemProperties(
-            color = Color(
-                Random.nextInt(255),
-                Random.nextInt(255),
-                Random.nextInt(255)
-            ),
-            width = Random.nextInt(20,100).dp,
-            height = Random.nextInt(10,100).dp
-        )
-    }
-    FlowColumn(
-        verticalArrangement = Arrangement.Center,
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .width(300.dp)
-            .height(120.dp)) {
-        items.forEach{
-            Box(modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(2.dp)
-                //.width(it.width)
-                .width(30.dp)
-                .height(30.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(it.color))
-        }
-    }
-}
-
-data class ItemProperties(
-    val color: Color,
-    val width: Dp,
-    val height: Dp
-)
 
 @Preview(showBackground = true)
 @Composable

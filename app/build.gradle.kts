@@ -90,4 +90,15 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.4.0-alpha10")
 
     implementation("com.google.android.gms:play-services-location:21.2.0")
+
+    //CameraX
+    implementation("androidx.camera:camera-camera2:1.3.3")
+    implementation("androidx.camera:camera-lifecycle:1.3.3")
+    implementation("androidx.camera:camera-view:1.3.3")
+
+    //Icon
+    implementation("androidx.compose.material:material-icons-extended:1.6.7")
+
+    //Coil
+    implementation("io.coil-kt:coil-compose:1.4.0")
 }
