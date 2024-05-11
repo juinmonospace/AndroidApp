@@ -13,7 +13,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -30,7 +29,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,10 +51,9 @@ import androidx.core.app.ActivityCompat
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import java.util.Calendar
-import java.util.Locale
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import kotlin.random.Random
 
 
@@ -77,20 +75,36 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = Color(0.753f, 0.753f, 0.933f)
                 ) {
 
                     //call function
                     //Start()
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(32.dp),
                         verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.Start
+                        horizontalAlignment = Alignment.Start,
+
                     ) {
-                        //display data from gps
-                        Text("Latitude: $latitude")
-                        Text("Longitude: $longitude")
-                        Text(getTimeAndDate())
+
+                        Column (modifier = Modifier.padding(40.dp))
+                        {
+                            Text ("Your current location: ", fontSize = 25.sp)
+                            Text("Latitude: $latitude",
+                                fontFamily = FontFamily.SansSerif,
+                                fontSize = 20.sp)
+                            Text("Longitude: $longitude",
+                                fontFamily = FontFamily.SansSerif,
+                                fontSize = 20.sp)
+                        }
+
+                        Column(modifier = Modifier.padding(40.dp)){
+                            Text("The current time and date: ", fontSize = 25.sp)
+                            Text(getTimeAndDate(),
+                                fontFamily = FontFamily.SansSerif,
+                                fontSize = 20.sp)
+                        }
+
                         //Text("Address: $address")
                         if (latitude != null){
                             Button(
