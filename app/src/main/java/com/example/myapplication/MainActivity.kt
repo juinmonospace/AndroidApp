@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
@@ -52,19 +51,27 @@ import androidx.core.app.ActivityCompat
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import java.util.Calendar
-import java.util.Locale
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import kotlin.random.Random
 
 
-class MainActivity : ComponentActivity() {
+//class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity(){
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
+    private lateinit var adapter: NoteAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         setContent {
             val (latitude, setLatitude) = remember {
@@ -72,6 +79,7 @@ class MainActivity : ComponentActivity() {
             }
             val (longitude, setLongitude) = remember { mutableStateOf("") }
             val (address, setAddress) = remember { mutableStateOf("") }
+
 
             MyApplicationTheme {
                 // A surface container using the 'background' color from the theme
@@ -94,7 +102,7 @@ class MainActivity : ComponentActivity() {
                         //Text("Address: $address")
                         if (latitude != null){
                             Button(
-                                onClick = { /*TODO*/ }, // navigate to new page/write note
+                                onClick = { /*NewNote().show(supportFragmentManager, null)*/ },
                                 modifier = Modifier.padding(16.dp),
                                 shape = CircleShape
                             ){
@@ -110,10 +118,58 @@ class MainActivity : ComponentActivity() {
 
             checkAndRequestPermissions(setLatitude, setLongitude)
             //getAddressLocation(latitude.toDouble(), longitude.toDouble(), setAddress)
+
         }
+        //adapter = NoteAdapter(this)
+        //binding.recyclerView.adapter = adapter
+        //binding.recyclerView.itemAnimator = DefaultItemAnimator()
+        //adapter.noteList = retrieveNotes()
+        //adapter.notifyItemRangeInserted(0, adapter.noteList.size)
     }
 
-// Get current date and time to display
+    fun createNewNote(note: Note) {
+        adapter.noteList.add(note)
+        adapter.notifyItemInserted(adapter.noteList.size -1)
+        saveNotes()
+    }
+
+    fun deleteNote(index: Int) {
+        adapter.noteList.removeAt(index)
+        adapter.notifyItemRemoved(index)
+        saveNotes()
+    }
+    fun showNote(index: Int) {
+        val dialog = ShowNote(adapter.noteList[index], index)
+        dialog.show(supportFragmentManager, null)
+    }
+    private fun saveNotes() {
+        val notes = adapter.noteList
+        val gson = GsonBuilder().create()
+        val jsonNotes = gson.toJson(notes)
+
+        val outputStream = openFileOutput(FILEPATH, Context.MODE_PRIVATE)
+        OutputStreamWriter(outputStream).use { writer ->
+            writer.write(jsonNotes)
+        }
+    }
+    private fun retrieveNotes(): MutableList<Note> {
+        val noteList = mutableListOf<Note>()
+        if (getFileStreamPath(FILEPATH).isFile) {
+            val fileInput = openFileInput(FILEPATH)
+            BufferedReader(InputStreamReader(fileInput)).use { reader ->
+                val stringBuilder = StringBuilder()
+                for (line in reader.readLine()) stringBuilder.append(line)
+
+                if (stringBuilder.isNotEmpty()){
+                    val listType = object : TypeToken<List<Note>>() {}.type
+                    noteList.addAll(Gson().fromJson(stringBuilder.toString(), listType))
+                }
+            }
+        }
+        return noteList
+    }
+
+    // Get current date and time to display
     private fun getTimeAndDate(): String{
         val currentDate = SimpleDateFormat("'Date: 'dd-MM-yyyy '\nTime: 'HH:mm:ss z")
         val currentDateAndTime = currentDate.format(Date())
@@ -159,6 +215,8 @@ class MainActivity : ComponentActivity() {
 
     companion object{
         private const val PERMISSION_REQUEST_ACCESS_LOCATION = 100
+        private const val FILEPATH = "notes.json"
+
     }
 
     private fun checkPermissions(): Boolean{

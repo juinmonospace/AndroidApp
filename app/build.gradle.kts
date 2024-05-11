@@ -38,6 +38,8 @@ android {
     }
     buildFeatures {
         compose = true
+        // VIEW BINDING
+        viewBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -90,4 +92,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.4.0-alpha10")
 
     implementation("com.google.android.gms:play-services-location:21.2.0")
+
+    //GSON Library
+    implementation("com.google.code.gson:gson:2.9.0")
 }
