@@ -4,7 +4,8 @@ enum class Screen{
     HOME,
     NOTES,
     GPS,
-    WELCOME
+    WELCOME,
+    LOCATION_AND_TIME
 }
 
 sealed class NavigationItem(val route: String){
@@ -12,6 +13,7 @@ sealed class NavigationItem(val route: String){
     object Home : NavigationItem("home")
     object Notes : NavigationItem("notes")
     object Gps : NavigationItem("gps")
+    object LocationAndTime : NavigationItem("locationAndTime")
 
     fun withArgs(vararg args: String): String{
         return buildString {

@@ -46,10 +46,9 @@ fun Navigation(){
         composable(route = Screen.HOME.name){
             MainScreen(navController = navController)
         }
+
         composable(
             route = "${NavigationItem.Notes.route}/{name}", // will crash if nothing passed
-            //route = NavigationItem.Notes.route + "?name = {name}",
-            //route = "${ NavigationItem.Notes.route}",
 
             arguments = listOf(
                 navArgument("name"){
@@ -79,13 +78,14 @@ fun WelcomeScreen(navController: NavController){
     ){
         Text("Welcome!", fontSize = 25.sp)
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "Press Button to retrieve your current time and location!", fontSize = 21.sp)
+        Text(text = "Press Button to make a note!", fontSize = 21.sp)
         Spacer(modifier = Modifier.height(20.dp))
         Button(
+            //onClick = {navController.navigate(NavigationItem.Gps.route)}
             onClick = {navController.navigate(NavigationItem.Gps.route)}
         )
         {
-            Text("Get Current Location and Time")
+            Text("Write note")
         }
     }
 }
@@ -93,7 +93,8 @@ fun WelcomeScreen(navController: NavController){
 @Composable
 fun GpsScreen(navController: NavController){
     Column {
-        Text("Gps Screen")
+        //Text("Gps Screen")
+
     }
 }
 
