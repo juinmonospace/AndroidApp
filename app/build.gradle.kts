@@ -90,4 +90,28 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.4.0-alpha10")
 
     implementation("com.google.android.gms:play-services-location:21.2.0")
+
+    // DATA STORAGE
+    //Preferences
+    //implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    //implementation("androidx.datastore:datastore-preferences:1.0.0-alpha01")
+
+    implementation("androidx.datastore:datastore-preferences-rxjava2:1.1.1")
+
+    //Lifecycle
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
+
+    //Kotlin coroutines
+    /*
+    implementation("org.jetbrains:kotlin:kotlin-stdlib-jdk7:1.4.10")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1")
+
+
+     */
+    implementation("androidx.datastore:datastore:1.0.0")
 }

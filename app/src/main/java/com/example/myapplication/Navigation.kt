@@ -90,13 +90,18 @@ fun WelcomeScreen(navController: NavController){
     }
 }
 
+
 @Composable
 fun GpsScreen(navController: NavController){
     Column {
         //Text("Gps Screen")
 
+
     }
 }
+
+
+
 
 
 @Composable
