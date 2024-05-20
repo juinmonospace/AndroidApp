@@ -1,54 +1,33 @@
 package com.example.myapplication
 
 //import java.lang.reflect.Modifier
-import android.content.Context
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Geocoder
-import android.location.Location
-import android.location.LocationManager
+//import okhttp3.Route
 import android.os.Bundle
-import android.provider.Settings
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat
-import androidx.lifecycle.asLiveData
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.ui.theme.NoteListScreen
+import com.example.myapplication.ui.theme.NoteListViewModel
+import com.example.myapplication.ui.theme.NoteScreen
+import com.example.myapplication.ui.theme.NoteViewModel
+import com.example.myapplication.ui.theme.util.Route
+import com.example.myapplication.ui.theme.util.UiEvent
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
@@ -69,10 +48,58 @@ class MainActivity : ComponentActivity() {
             }
             val (longitude, setLongitude) = remember { mutableStateOf("") }
             val (address, setAddress) = remember { mutableStateOf("") }
-            val scope = rememberCoroutineScope()
-            var name by remember { mutableStateOf("") }
 
             MyApplicationTheme {
+                val navController = rememberNavController()
+                NavHost(
+                    navController = navController,
+                    startDestination = Route.noteList
+                ){
+                    composable(route = Route.noteList){
+                        val viewModel = hiltViewModel<NoteListViewModel>()
+                        val noteList by viewModel.noteList.collectAsStateWithLifecycle()
+
+                        NoteListScreen(
+                            noteList = noteList,
+                            onNoteClick = {
+                                navController.navigate(
+                                    Route.note.replace(
+                                        "{id}",
+                                        it.id.toString()
+                                    )
+                                )
+                            },
+                            onAddNoteClick = {
+                                navController.navigate(Route.note)
+                            }
+                        )
+                    }
+                    composable(route = Route.note) {
+                        val viewModel = hiltViewModel<NoteViewModel>()
+                        val state by viewModel.state.collectAsStateWithLifecycle()
+
+                        LaunchedEffect(key1 = true) {
+                            viewModel.event.collect { event ->
+                                when (event) {
+                                    is UiEvent.NavigateBack -> {
+                                        navController.popBackStack()
+                                    }
+
+                                    else -> Unit
+                                }
+                            }
+                    }
+                        NoteScreen(
+                            state = state,
+                            onEvent = viewModel::onEvent
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+/*
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -88,22 +115,6 @@ class MainActivity : ComponentActivity() {
                         Column()
                         {
 
-                           // Note(userManager, scope)
-                            Button(
-                                //onClick = {navController.navigate(NavigationItem.Gps.route)}
-                                onClick = {buttonSave()}
-                            )
-                            {
-                                Text("save")
-                            }
-
-
-                            //observeData()
-                            OutlinedTextField(
-                                value = name,
-                                onValueChange = { name = it },
-                                label = { Text("Name") }
-                            )
 
                             Text("Your current location: ", fontSize = 22.sp)
                             Text(
@@ -139,30 +150,7 @@ class MainActivity : ComponentActivity() {
 
                     }
                 }
-    private fun observeData() {
 
-
-        // Updates name
-        // every time user name changes it will be observed by userNameFlow
-        // here it refers to the value returned from the usernameFlow function
-        // of UserManager class
-        userManager.userNameFlow.asLiveData().observe(this) {
-            name = it
-            tvName.text = it.toString()
-        }
-    }
-
-
-    private fun buttonSave() {
-        // Gets the user input and saves it
-        saveButton.setOnClickListener {
-            name = etName.text.toString()
-
-            GlobalScope.launch {
-                userManager.storeUser(name)
-            }
-        }
-    }
 
     private fun checkAndRequestPermissions(
                     setLatitude: (String) -> Unit,
@@ -316,13 +304,28 @@ class GeocoderLocation(private val context: Context) {
     }
 }
 
-
-
-@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    MyApplicationTheme {
-        //Start()
+fun TextFieldNotes(){
+    /*
+    // Note(userManager, scope)
+                            Button(
+                                //onClick = {navController.navigate(NavigationItem.Gps.route)}
+                                onClick = {buttonSave()}
+                            )
+                            {
+                                Text("save")
+                            }
 
-    }
+
+                            //observeData()
+                            OutlinedTextField(
+                                value = name,
+                                onValueChange = { name = it },
+                                label = { Text("Name") }
+                            )
+
+     */
 }
+
+
+ */
