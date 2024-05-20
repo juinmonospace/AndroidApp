@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 //import java.lang.reflect.Modifier
+//import androidx.lifecycle.asLiveData
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -19,8 +20,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,13 +36,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.asLiveData
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -88,23 +84,6 @@ class MainActivity : ComponentActivity() {
                         Column()
                         {
 
-                           // Note(userManager, scope)
-                            Button(
-                                //onClick = {navController.navigate(NavigationItem.Gps.route)}
-                                onClick = {buttonSave()}
-                            )
-                            {
-                                Text("save")
-                            }
-
-
-                            //observeData()
-                            OutlinedTextField(
-                                value = name,
-                                onValueChange = { name = it },
-                                label = { Text("Name") }
-                            )
-
                             Text("Your current location: ", fontSize = 22.sp)
                             Text(
                                 "Latitude: $latitude",
@@ -139,30 +118,7 @@ class MainActivity : ComponentActivity() {
 
                     }
                 }
-    private fun observeData() {
 
-
-        // Updates name
-        // every time user name changes it will be observed by userNameFlow
-        // here it refers to the value returned from the usernameFlow function
-        // of UserManager class
-        userManager.userNameFlow.asLiveData().observe(this) {
-            name = it
-            tvName.text = it.toString()
-        }
-    }
-
-
-    private fun buttonSave() {
-        // Gets the user input and saves it
-        saveButton.setOnClickListener {
-            name = etName.text.toString()
-
-            GlobalScope.launch {
-                userManager.storeUser(name)
-            }
-        }
-    }
 
     private fun checkAndRequestPermissions(
                     setLatitude: (String) -> Unit,
@@ -267,34 +223,7 @@ fun Note(userManager: UserManager, scope: CoroutineScope){
     var name by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier.padding(25.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.Start
-    ) {
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Name") }
-        )
 
-        OutlinedTextField(
-            value = age,
-            onValueChange = { age = it },
-            label = { Text("Age") }
-        )
-/*
-        Button(onClick = {
-            scope.launch {
-                val ageInt = age.toIntOrNull() ?: 0
-                //userManager.storeUser(ageInt, name)
-            }
-        }) {
-            Text("Save Note")
-        }
-
- */
-    }
 }
 
 
