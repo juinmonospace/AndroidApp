@@ -1,4 +1,4 @@
-package com.example.myapplication
+/*package com.example.myapplication
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -124,18 +124,6 @@ fun MainScreen(navController: NavController){
             Text(text = "To NotesScreen")
         }
     }
-}
-
-/*
-@Composable
-fun NotesScreen(name: String?){
-//fun NotesScreen(){
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()){
-        Text(text = "Hello, $name")
-    }
-
 }
 
  */

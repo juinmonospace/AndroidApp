@@ -1,3 +1,4 @@
+/*
 package com.example.myapplication
 
 import android.content.Context
@@ -33,5 +34,4 @@ class UserManager(context: Context) {
         it[USER_NAME_KEY] ?: ""
     }
 }
-
-
+ */

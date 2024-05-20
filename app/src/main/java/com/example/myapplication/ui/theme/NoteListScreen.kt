@@ -55,13 +55,13 @@ fun NoteListScreen(
             }
             items(noteList) { note ->
                 ListItem(
-                    headlineContent = {
+                    headlineText = {
                         Text(
                             text = note.title,
                             style = MaterialTheme.typography.titleMedium
                         )
                     },
-                    supportingContent = {
+                    supportingText = {
                         Text(
                             text = note.content,
                             maxLines = 2,

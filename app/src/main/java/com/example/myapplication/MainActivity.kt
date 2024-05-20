@@ -3,9 +3,6 @@ package com.example.myapplication
 //import java.lang.reflect.Modifier
 //import okhttp3.Route
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.LaunchedEffect
@@ -24,20 +21,21 @@ import com.example.myapplication.ui.theme.NoteScreen
 import com.example.myapplication.ui.theme.NoteViewModel
 import com.example.myapplication.ui.theme.util.Route
 import com.example.myapplication.ui.theme.util.UiEvent
-import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-
+    //private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+/*
     lateinit var etName: EditText
     lateinit var tvName: TextView
     lateinit var saveButton: Button
 
     lateinit var userManager: UserManager
-    var name = ""
+    //var name = ""
 
+
+ */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

@@ -1,3 +1,4 @@
+/*
 package com.example.myapplication
 
 import android.content.Context
@@ -79,27 +80,6 @@ private suspend fun saveNote(name: String, age: Int) {
 
 
 
-/*
-lateinit var etName: EditText
-lateinit var etAge: EditText
-lateinit var tvName: TextView
-lateinit var tvAge: TextView
-lateinit var saveButton: Button
-lateinit var userManager: UserManager
-var age = 0
-var name = ""
-
-
- */
-
-
-/*
-etName = findViewById(R.id.et_name)
-etAge = findViewById(R.id.et_age)
-tvName = findViewById(R.id.tv_name)
-tvAge = findViewById(R.id.tv_age)
-saveButton = findViewById(R.id.btn_save)
- */
 
 /*
 @Composable
@@ -138,4 +118,5 @@ private suspend fun saveNote(){
        // GlobalScope.launch {
         userManager.storeUser(age, name)
         //}
-    }}*/
+    }
+ */

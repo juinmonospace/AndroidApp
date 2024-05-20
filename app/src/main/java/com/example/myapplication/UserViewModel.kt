@@ -1,3 +1,4 @@
+/*
 package com.example.myapplication
 
 import android.app.Application
@@ -16,3 +17,4 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
 
     val userNameFlow = userManager.userNameFlow
 }
+ */
