@@ -1,15 +1,20 @@
 package com.example.myapplication
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,14 +25,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import com.example.myapplication.ui.theme.Acharnes
+import com.example.myapplication.ui.theme.Flighter
 import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
 
@@ -43,43 +51,12 @@ fun Navigation(){
         composable(route = Screen.WELCOME.name){
             WelcomeScreen(navController = navController)
         }
-
         composable(route = Screen.STARTTIME.name){
             StartTimeScreen(navController = navController)
         }
         composable(route = Screen.WATCHRUNNING.name){
             WatchRunningScreen(navController = navController)
         }
-        /*
-        composable(
-            route = "${Screen.STOPPEDTIME.name}/{elapsedTime}",
-            arguments = listOf(navArgument("elapsedTime") { type = NavType.LongType })
-        ) {
-            val elapsedTime = it.arguments?.getLong("elapsedTime") ?: 0L
-            StoppedTimeScreen(navController = navController, passedTime = passedTime)
-        }
-
-         */
-
-        composable(
-            route = "${NavigationItem.Notes.route}/{name}", // will crash if nothing passed
-
-            arguments = listOf(
-                navArgument("name"){
-                    type = NavType.StringType
-                    defaultValue = "Judith"
-                    nullable = true
-                }
-            )
-
-
-        )
-        {
-            entry ->
-            NotesScreen(name = entry.arguments?.getString("name"))
-            //NotesScreen()
-        }
-
     }
 }
 
@@ -88,17 +65,17 @@ fun WelcomeScreen(navController: NavController){
     Column(
         modifier = Modifier.padding(32.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.Start
+        horizontalAlignment = Alignment.CenterHorizontally
     ){
-        Text("Welcome!", fontSize = 25.sp)
+        Text("Welcome!", fontSize = 25.sp,)
         Spacer(modifier = Modifier.height(12.dp))
-        Text(text = "Go to Stop Watch", fontSize = 21.sp)
+        //Text(text = "Go to Stop Watch", fontSize = 21.sp)
         Spacer(modifier = Modifier.height(20.dp))
         Button(
             onClick = {navController.navigate(NavigationItem.StartTime.route)}
         )
         {
-            Text("Stop Watch")
+            Text("Stop Time!", fontFamily = Flighter,fontSize = 23.sp)
         }
     }
 }
@@ -107,20 +84,27 @@ fun WelcomeScreen(navController: NavController){
 @Composable
 fun StartTimeScreen(navController: NavController){
     Column(
-        modifier = Modifier.padding(32.dp),
+        modifier = Modifier.padding(40.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.Start
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Here we have the stop watch function! ")
         //time ui
         StopWatchDisplay(elapsedTime = 0)
+        Spacer(modifier = Modifier.padding(60.dp))
+        Column(
+            modifier = Modifier.padding(40.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
         Button(
             onClick = {
-                //startRunningTime();
-                navController.navigate(NavigationItem.WatchRunning.route) }
+                navController.navigate(NavigationItem.WatchRunning.route) },
+            shape = CircleShape,
+            border = BorderStroke(6.dp, Color.White),
+            modifier = Modifier.size(120.dp),
         )
         {
-            Text("Start")
+            Text("Start", fontFamily = Flighter,fontSize = 23.sp)
+        }
         }
 
     }
@@ -129,18 +113,10 @@ fun StartTimeScreen(navController: NavController){
 
 @Composable
 fun WatchRunningScreen(navController: NavController){
-    var passedTime by remember { mutableStateOf(0L)
-    }
-    var timeIsRunning by remember {
-        mutableStateOf(true)
-    }
+    var passedTime by remember { mutableStateOf(0L) }
+    var timeIsRunning by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
 
-    Column(
-        modifier = Modifier.padding(32.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.Start    )
-    {
     LaunchedEffect(timeIsRunning) {
         if (timeIsRunning) {
             while (true) {
@@ -150,80 +126,93 @@ fun WatchRunningScreen(navController: NavController){
         }
     }
 
-        Text("Time is ticking...")
+    Column(
+        modifier = Modifier
+            .padding(40.dp)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(80.dp))
         StopWatchDisplay(elapsedTime = passedTime)
-        Row {
-            //either stop or resume
-            Button(onClick = {timeIsRunning = !timeIsRunning})
-            {
-                if (timeIsRunning){
-                    Text("Stop")
-                    //timeIsRunning = false
-                } else {
-                    Text("Resume")
-                    //timeIsRunning = true
-                }
+        Spacer(modifier = Modifier.height(50.dp))
+        Button(
+            border = BorderStroke(6.dp, Color.White),
+            modifier = Modifier.size(120.dp),
+            onClick = { timeIsRunning = !timeIsRunning }
+        ) {
+            if (timeIsRunning) {
+                Text("Stop", fontFamily = Flighter, fontSize = 23.sp)
+            } else {
+                Text("Resume", fontFamily = Flighter, fontSize = 23.sp)
             }
-            Button(onClick = {
-                timeIsRunning = false
-                navController.navigate(NavigationItem.StartTime.route)
-            }) {
-                Text("Reset")
+        }
+        Spacer(modifier = Modifier.height(50.dp))
+        Row(
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Spacer(modifier = Modifier.weight(1f))
+            Button(
+                border = BorderStroke(6.dp, Color.White),
+                onClick = {
+                    timeIsRunning = false
+                    navController.navigate(NavigationItem.StartTime.route)
+                }
+            ) {
+                Text("Reset", fontFamily = Flighter, fontSize = 23.sp)
             }
         }
     }
-    
 }
 
-/*
- @Composable
- fun StoppedTimeScreen(passedTime: Long){
-     Column(
-         modifier = Modifier.padding(32.dp),
-         verticalArrangement = Arrangement.Center,
-         horizontalAlignment = Alignment.Start    )
-     {
-         Text("Time has stopped")
-         StopWatchDisplay(elapsedTime = passedTime)
-         Row {
-             Button(onClick = { /*TODO*/ }) {
-                 Text("Resume")
-             }
-             Button(onClick = {navController.navigate(NavigationItem.StartTime.route)})
-             {
-                 Text(text = "Reset")
-             }
-         }
-         
-     }
- }
 
- */
+
+@Composable
+fun ButtonDesign(
+    modifier: Modifier = Modifier.size(100.dp),
+    shape: Shape = CircleShape,
+    border: BorderStroke = BorderStroke(6.dp, Color.DarkGray),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Blue),
+    onClick: () -> Unit,
+    function: @Composable () -> Unit
+    ) { Button(
+            onClick = onClick,
+            modifier = modifier,
+            shape = shape,
+            border = border,
+            contentPadding = contentPadding,
+            colors = colors
+    ) {
+        Text(text = "")
+}
+}
 
 @Composable
 fun StopWatchDisplay(elapsedTime: Long) {
-    val hours = TimeUnit.MILLISECONDS.toHours(elapsedTime)
+    //val hours = TimeUnit.MILLISECONDS.toHours(elapsedTime)
     val minutes = TimeUnit.MILLISECONDS.toMinutes(elapsedTime) % 60
     val seconds = TimeUnit.MILLISECONDS.toSeconds(elapsedTime) % 60
     val milliseconds = (elapsedTime % 1000) / 10
 
-    val formattedTime = String.format("%02d:%02d:%02d.%02d", hours, minutes, seconds, milliseconds)
+    val formattedTime = String.format("%02d:%02d:%02d", minutes, seconds, milliseconds)
     Text(
         text = formattedTime,
-        style = MaterialTheme.typography.headlineMedium,
-        fontSize = 24.sp
+        fontFamily = Acharnes,
+        fontSize = 45.sp,
     )
 }
 
 
+fun func(){}
 
+@Preview
 @Composable
-fun NotesScreen(name: String?){
-//fun NotesScreen(){
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()){
-        Text(text = "Hello, $name")
-    }
-
+fun Preview(){
+    val navController : NavController = rememberNavController()
+    WatchRunningScreen(navController)
 }
+
+
+
