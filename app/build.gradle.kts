@@ -106,6 +106,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
 
     //Kotlin coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
     /*
     implementation("org.jetbrains:kotlin:kotlin-stdlib-jdk7:1.4.10")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1")
