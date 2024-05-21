@@ -6,7 +6,9 @@ enum class Screen{
     WELCOME,
     LOCATION_AND_TIME,
     WATCHRUNNING,
-    STOPPEDTIME
+    STOPPEDTIME,
+    TIMER,
+    TIMERISRUNNING
 }
 
 sealed class NavigationItem(val route: String){
@@ -15,6 +17,8 @@ sealed class NavigationItem(val route: String){
     object StartTime : NavigationItem("startTime")
     object WatchRunning: NavigationItem("watchRunning")
     object StoppedTime : NavigationItem("stoppedTime")
+    object Timer : NavigationItem("timer")
+    object TimerIsRunning : NavigationItem("timerIsRunning")
     object LocationAndTime : NavigationItem("locationAndTime")
 
     fun withArgs(vararg args: String): String{
