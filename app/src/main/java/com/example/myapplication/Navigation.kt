@@ -72,7 +72,8 @@ fun Navigation(){
             TimerScreen(navController = navController)
         }
         composable(route = Screen.TIMERISRUNNING.name){
-            TimerIsRunningScreen(navController = navController, remainingTime = 3L)
+            TimerIsRunningScreen(navController = navController)
+               // , remainingTime = 3L)
         }
     }
 }
@@ -118,7 +119,6 @@ fun TimerScreen(navController: NavController){
         Spacer(modifier = Modifier.height(60.dp))
         Button(onClick = {
             navController.navigate(NavigationItem.TimerIsRunning.route)
-            //TimerIsRunning()
             //startTimer(selectedHour = 0, selectedMinute = 0, selectedSecond = 3)
         }) {
             Text(text = "Start", fontFamily = Flighter)
@@ -127,35 +127,61 @@ fun TimerScreen(navController: NavController){
 }
 
 @Composable
-fun TimerIsRunningScreen(navController: NavController, remainingTime: Long){
-    //StopWatchDisplay(elapsedTime = 3)
-    while(remainingTime.toInt() != 0){
+fun TimerIsRunningScreen(navController: NavController) {
+    var timeIsRunning by remember { mutableStateOf(true) }
+    var remainingTime by remember { mutableStateOf(3L) }
+
+    LaunchedEffect(timeIsRunning) {
+        if (timeIsRunning) {
+            while (remainingTime > 0) {
+                delay(1000L) // Delay for 1 second
+                remainingTime -= 1
+            }
+            timeIsRunning = false //stop timer when it reaches 0
+        }
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        TimerRunningDisplay(remainingTime = remainingTime)
         Row {
-            Button(onClick = { navController.navigate(NavigationItem.Timer.route)}) {
-                Text(text = "Cancel", fontFamily = Flighter)
-            }
-            Button(onClick = {
-                //TODO: pause timer
-            }) {
-                Text(text = "Pause", fontFamily = Flighter)
+            if (remainingTime.toInt() !=0) {
+                Button(onClick = { timeIsRunning = !timeIsRunning }) {
+                    Text(text = if (timeIsRunning) "Pause" else "Resume", fontFamily = Flighter)
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(onClick = { navController.navigate("Timer") }) {
+                    Text(text = "Cancel", fontFamily = Flighter)
+                }
             }
         }
-        while(remainingTime.toInt() <= 4 && remainingTime.toInt() != 0){
-            Text("Time is running up!", fontFamily = Montserrat)
+        Spacer(modifier = Modifier.height(16.dp))
+        if (remainingTime <= 4 && remainingTime > 0) {
+            Text("Time is running up!", fontFamily = Flighter)
+        }
+        if (remainingTime == 0L) {
+            Text(text = "Time ran up!")
+            Row {
+                Button(onClick = { remainingTime = 3L; timeIsRunning = true }) {
+                    Text(text = "Restart Timer", fontFamily = Flighter)
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(onClick = { navController.navigate("Welcome") }) {
+                    Text(text = "Menu", fontFamily = Flighter)
+                }
+            }
         }
     }
-    Text(text = "Time ran up!")
-    Row {
-        Button(onClick = { navController.navigate(NavigationItem.Timer.route) }) {
-            Text(text = "Restart", fontFamily = Flighter)
-        }
-        Button(onClick = { /*TODO*/ }) {
-
-        }
-    }
-
 }
 
+@Composable
+fun TimerRunningDisplay(remainingTime: Long){
+    Text(text = String.format("%02d:%02d", remainingTime / 60, remainingTime % 60), fontFamily = Acharnes)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -314,17 +340,27 @@ fun StartTimeScreen(navController: NavController){
         Column(
             modifier = Modifier.padding(40.dp),
             horizontalAlignment = Alignment.CenterHorizontally
-        ){
-        Button(
-            onClick = {
-                navController.navigate(NavigationItem.WatchRunning.route) },
-            shape = CircleShape,
-            border = BorderStroke(6.dp, Color.White),
-            modifier = Modifier.size(120.dp),
-        )
-        {
-            Text("Start", fontFamily = Flighter,fontSize = 23.sp)
-        }
+        ) {
+            Button(
+                onClick = {
+                    navController.navigate(NavigationItem.WatchRunning.route)
+                },
+                shape = CircleShape,
+                border = BorderStroke(6.dp, Color.White),
+                modifier = Modifier.size(120.dp),
+            )
+            {
+                Text("Start", fontFamily = Flighter, fontSize = 23.sp)
+            }
+            Spacer(modifier = Modifier.height(50.dp))
+            Row (
+                horizontalArrangement = Arrangement.End
+            ){
+                Spacer(modifier = Modifier.width(100.dp))
+                Button(onClick = { navController.navigate(NavigationItem.Welcome.route) }) {
+                    Text(text = "Menu", fontFamily = Flighter)
+                }
+            }
         }
 
     }
@@ -434,7 +470,8 @@ fun Preview(){
     //WatchRunningScreen(navController)
     //WelcomeScreen(navController)
     //TimerScreen(navController)
-    TimerIsRunningScreen(navController = navController, remainingTime =4)
+    //TimerIsRunningScreen(navController = navController)
+    StartTimeScreen(navController = navController)
 }
 
 
