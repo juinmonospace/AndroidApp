@@ -1,19 +1,17 @@
 package com.example.myapplication
 
 enum class Screen{
-    STARTTIME,
+    STOPWATCH,
     WELCOME,
     WATCHRUNNING,
-    STOPPEDTIME,
     TIMER,
     TIMERISRUNNING
 }
 
 sealed class NavigationItem(val route: String){
     object Welcome : NavigationItem("welcome")
-    object StartTime : NavigationItem("startTime")
+    object Stopwatch : NavigationItem("stopwatch")
     object WatchRunning: NavigationItem("watchRunning")
-    object StoppedTime : NavigationItem("stoppedTime")
     object Timer : NavigationItem("timer")
     object TimerIsRunning : NavigationItem("timerIsRunning")
     //arguments = listOf(navArgument("remainingTime") { type = NavType.LongType })

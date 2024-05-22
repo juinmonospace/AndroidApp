@@ -25,11 +25,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
+import com.example.myapplication.ui.theme.Montserrat
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -59,42 +59,31 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color(0.753f, 0.753f, 0.933f)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(15.dp),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.Start,
-                    ) {
-
-
-                        Column()
+                        Column(
+                               modifier = Modifier.padding(15.dp),
+                               verticalArrangement = Arrangement.Top,
+                               horizontalAlignment = Alignment.Start,
+                        )
                         {
-
-                            Text("Your current location: ", fontSize = 22.sp)
                             Text(
                                 "Latitude: $latitude",
-                                fontFamily = FontFamily.SansSerif,
-                                fontSize = 18.sp
+                                fontFamily = Montserrat,
+                                fontSize = 14.sp
                             )
                             Text(
                                 "Longitude: $longitude",
-                                fontFamily = FontFamily.SansSerif,
-                                fontSize = 18.sp
+                                fontFamily = Montserrat,
+                                fontSize = 14.sp
                             )
-                        }
-
-                        Column() {
-                            Text("The current time and date: ", fontSize = 22.sp)
                             Text(
                                 getTimeAndDate(),
-                                fontFamily = FontFamily.SansSerif,
-                                fontSize = 18.sp
+                                fontFamily = Montserrat,
+                                fontSize = 14.sp
                             )
                         }
-                    }
                     Navigation()
                 }
             }
-
                         fusedLocationProviderClient =
                             LocationServices.getFusedLocationProviderClient(this@MainActivity)
                         checkAndRequestPermissions(setLatitude, setLongitude)
