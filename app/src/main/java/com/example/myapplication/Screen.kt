@@ -16,6 +16,7 @@ sealed class NavigationItem(val route: String){
     object StoppedTime : NavigationItem("stoppedTime")
     object Timer : NavigationItem("timer")
     object TimerIsRunning : NavigationItem("timerIsRunning")
+    //arguments = listOf(navArgument("remainingTime") { type = NavType.LongType })
 
     fun withArgs(vararg args: String): String{
         return buildString {

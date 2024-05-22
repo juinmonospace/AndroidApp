@@ -20,10 +20,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,9 +45,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.myapplication.ui.theme.Acharnes
 import com.example.myapplication.ui.theme.Flighter
 import com.example.myapplication.ui.theme.Montserrat
@@ -56,7 +62,8 @@ fun Navigation(){
     NavHost(
         navController = navController,
         //startDestination = NavigationItem.Home.route
-        startDestination = NavigationItem.Welcome.route
+        startDestination = NavigationItem.Welcome.route,
+
     )
     {
         composable(route = Screen.WELCOME.name){
@@ -71,9 +78,13 @@ fun Navigation(){
         composable(route = Screen.TIMER.name){
             TimerScreen(navController = navController)
         }
-        composable(route = Screen.TIMERISRUNNING.name){
-            TimerIsRunningScreen(navController = navController)
-               // , remainingTime = 3L)
+
+        composable(
+            route = "timerIsRunning/{totalTimeInMillis}",
+            arguments = listOf(navArgument("totalTimeInMillis") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val totalTimeInMillis = backStackEntry.arguments?.getLong("totalTimeInMillis") ?: 0L
+            TimerIsRunningScreen(navController = navController, setTimerDuration = totalTimeInMillis)
         }
     }
 }
@@ -107,39 +118,158 @@ fun WelcomeScreen(navController: NavController){
     }
 }
 
+/*
 @Composable
 fun TimerScreen(navController: NavController){
+    var timerDuration by remember { mutableStateOf(Long) }
+
+    var remainingTime by remember { mutableStateOf(Long)}
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(remainingTime) % 60
+    val seconds = TimeUnit.MILLISECONDS.toSeconds(remainingTime) % 60
+    val milliseconds = (remainingTime % 1000) / 10
+    var selectedHour by remember { mutableStateOf(0) }
+    var selectedMinute by remember { mutableStateOf(0) }
+    var selectedSecond by remember { mutableStateOf(0) }
+
+    //convert selected timer duration into Long argument to pass
+    val totalTimeInMillis = remember(selectedHour, selectedMinute, selectedSecond) {
+        (selectedHour * 3600 + selectedMinute * 60 + selectedSecond) * 1000L
+    }
+
+    val formattedTime = String.format("%02d:%02d:%02d", minutes, seconds, milliseconds)
+    Column {
+        Row (
+            //modifier = Modifier.padding(4.dp)
+        ){
+            Text(text = "Hours", fontFamily = Montserrat)
+            Spacer(modifier = Modifier.width(29.dp))
+            Text(text = "Minutes", fontFamily = Montserrat)
+            Spacer(modifier = Modifier.width(29.dp))
+            Text(text = "Seconds", fontFamily = Montserrat)
+        }
+        Spacer(modifier = Modifier.height(70.dp))
+        TimePicker(
+            selectedHour = selectedHour,
+            onHourChange = { selectedHour = it },
+            selectedMinute = selectedMinute,
+            onMinuteChange = { selectedMinute = it },
+            selectedSecond = selectedSecond,
+            onSecondChange = { selectedSecond = it }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = String.format("%02d:%02d:%02d", selectedHour, selectedMinute, selectedSecond),
+            fontFamily = Montserrat
+        )
+        //TimePickerDemo()
+        //Text(text = formattedTime, fontFamily = Acharnes, fontSize = 45.sp,)
+        Spacer(modifier = Modifier.height(50.dp))
+        Button(onClick = {
+            navController.navigate("timerIsRunning/$totalTimeInMillis")
+            //navController.navigate(NavigationItem.TimerIsRunning.route)
+        }) {
+            Text(text = "Start", fontFamily = Flighter)
+        }
+    }
+
+    /*
     Column (
         modifier = Modifier.padding(40.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
         ) {
         Spacer(modifier = Modifier.height(80.dp))
-        TimerDisplay(remainingTime = 0)
+        //TimerDisplay(remainingTime = 0)
         Spacer(modifier = Modifier.height(60.dp))
+
         Button(onClick = {
-            navController.navigate(NavigationItem.TimerIsRunning.route)
-            //startTimer(selectedHour = 0, selectedMinute = 0, selectedSecond = 3)
+            navController.navigate("timerIsRunning/$totalTimeInMillis")
+            //navController.navigate(NavigationItem.TimerIsRunning.route)
         }) {
+            Text(text = "Start", fontFamily = Flighter)
+        }
+    }
+     */
+}
+
+ */
+
+@Composable
+fun TimerScreen(navController: NavController) {
+    var selectedHour by remember { mutableStateOf(0) }
+    var selectedMinute by remember { mutableStateOf(0) }
+    var selectedSecond by remember { mutableStateOf(0) }
+
+    // Convert selected timer duration into Long argument to pass
+    val totalTimeInMillis = remember(selectedHour, selectedMinute, selectedSecond) {
+        (selectedHour * 3600 + selectedMinute * 60 + selectedSecond) * 1000L
+    }
+
+    var timerDuration by remember { mutableStateOf(totalTimeInMillis) }
+    var remainingTime by remember { mutableStateOf(timerDuration) }
+
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(remainingTime) % 60
+    val seconds = TimeUnit.MILLISECONDS.toSeconds(remainingTime) % 60
+    val milliseconds = (remainingTime % 1000) / 10
+
+    Column (
+        modifier = Modifier.padding(30.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    )
+    {
+        Row {
+            Text(text = "Hours", fontFamily = Montserrat)
+            Spacer(modifier = Modifier.width(29.dp))
+            Text(text = "Minutes", fontFamily = Montserrat)
+            Spacer(modifier = Modifier.width(29.dp))
+            Text(text = "Seconds", fontFamily = Montserrat)
+        }
+        Spacer(modifier = Modifier.height(50.dp))
+        TimePicker(
+            selectedHour = selectedHour,
+            onHourChange = { selectedHour = it },
+            selectedMinute = selectedMinute,
+            onMinuteChange = { selectedMinute = it },
+            selectedSecond = selectedSecond,
+            onSecondChange = { selectedSecond = it }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = String.format("%02d:%02d:%02d", selectedHour, selectedMinute, selectedSecond),
+            fontFamily = Montserrat
+        )
+        Spacer(modifier = Modifier.height(50.dp))
+        Button(onClick = {
+            navController.navigate("timerIsRunning/$totalTimeInMillis")
+        }) {
+            Icon(Icons.Rounded.PlayArrow, contentDescription = "Play")
             Text(text = "Start", fontFamily = Flighter)
         }
     }
 }
 
+
 @Composable
-fun TimerIsRunningScreen(navController: NavController) {
+fun TimerIsRunningScreen(navController: NavController, setTimerDuration: Long) {
     var timeIsRunning by remember { mutableStateOf(true) }
-    var remainingTime by remember { mutableStateOf(3L) }
+    var remainingTime by remember { mutableStateOf(setTimerDuration) }
+
 
     LaunchedEffect(timeIsRunning) {
         if (timeIsRunning) {
             while (remainingTime > 0) {
                 delay(1000L) // Delay for 1 second
-                remainingTime -= 1
+                remainingTime -= 1000L
             }
             timeIsRunning = false //stop timer when it reaches 0
         }
     }
+
+    //compute remaining time in hours, minutes, seconds
+    val hours = TimeUnit.MILLISECONDS.toHours(remainingTime)
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(remainingTime) % 60
+    val seconds = TimeUnit.MILLISECONDS.toSeconds(remainingTime) % 60
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -147,7 +277,13 @@ fun TimerIsRunningScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        TimerRunningDisplay(remainingTime = remainingTime)
+        //TimerRunningDisplay(remainingTime = remainingTime)
+        // Timer counting down UI
+        Text(
+            text= String.format("%02d:%02d:%02d",hours, minutes, seconds ),
+            fontFamily = Acharnes
+            )
+
         Row {
             if (remainingTime.toInt() !=0) {
                 Button(onClick = { timeIsRunning = !timeIsRunning }) {
@@ -160,13 +296,15 @@ fun TimerIsRunningScreen(navController: NavController) {
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        if (remainingTime <= 4 && remainingTime > 0) {
+        //TODO: correct this placement
+        if (remainingTime <= 4000 && remainingTime > 0) {
             Text("Time is running up!", fontFamily = Flighter)
         }
         if (remainingTime == 0L) {
             Text(text = "Time ran up!")
             Row {
                 Button(onClick = { remainingTime = 3L; timeIsRunning = true }) {
+                    Icon(Icons.Rounded.Refresh, contentDescription = "Restart")
                     Text(text = "Restart Timer", fontFamily = Flighter)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
@@ -183,6 +321,7 @@ fun TimerRunningDisplay(remainingTime: Long){
     Text(text = String.format("%02d:%02d", remainingTime / 60, remainingTime % 60), fontFamily = Acharnes)
 }
 
+// Diplays the Time Picker
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimerDisplay(remainingTime: Long){
@@ -190,6 +329,14 @@ fun TimerDisplay(remainingTime: Long){
     val minutes = TimeUnit.MILLISECONDS.toMinutes(remainingTime) % 60
     val seconds = TimeUnit.MILLISECONDS.toSeconds(remainingTime) % 60
     val milliseconds = (remainingTime % 1000) / 10
+    var selectedHour by remember { mutableStateOf(0) }
+    var selectedMinute by remember { mutableStateOf(0) }
+    var selectedSecond by remember { mutableStateOf(0) }
+
+    //convert selected timer duration into Long argument to pass
+    val totalTimeInMillis = remember(selectedHour, selectedMinute, selectedSecond) {
+        (selectedHour * 3600 + selectedMinute * 60 + selectedSecond) * 1000L
+    }
 
     val formattedTime = String.format("%02d:%02d:%02d", minutes, seconds, milliseconds)
     Column {
@@ -203,17 +350,36 @@ fun TimerDisplay(remainingTime: Long){
             Text(text = "Seconds", fontFamily = Montserrat)
         }
         Spacer(modifier = Modifier.height(70.dp))
-        TimePickerDemo()
+        TimePicker(
+            selectedHour = selectedHour,
+            onHourChange = { selectedHour = it },
+            selectedMinute = selectedMinute,
+            onMinuteChange = { selectedMinute = it },
+            selectedSecond = selectedSecond,
+            onSecondChange = { selectedSecond = it }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = String.format("%02d:%02d:%02d", selectedHour, selectedMinute, selectedSecond),
+            fontFamily = Montserrat
+        )
+        //TimePickerDemo()
         //Text(text = formattedTime, fontFamily = Acharnes, fontSize = 45.sp,)
         Spacer(modifier = Modifier.height(50.dp))
     }
 }
 
+/*
 @Composable
-fun TimePickerDemo() {
+fun TimePickerDemo(){
     var selectedHour by remember { mutableStateOf(0) }
     var selectedMinute by remember { mutableStateOf(0) }
     var selectedSecond by remember { mutableStateOf(0) }
+
+    //convert selected timer duration into Long argument to pass
+    val totalTimeInMillis = remember(selectedHour, selectedMinute, selectedSecond) {
+        (selectedHour * 3600 + selectedMinute * 60 + selectedSecond) * 1000L
+    }
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -233,7 +399,10 @@ fun TimePickerDemo() {
             fontFamily = Montserrat
         )
     }
+
+
 }
+ */
 
 @Composable
 fun TimePicker(
@@ -461,17 +630,15 @@ fun StopWatchDisplay(elapsedTime: Long) {
 }
 
 
-fun func(){}
-
 @Preview
 @Composable
 fun Preview(){
     val navController : NavController = rememberNavController()
     //WatchRunningScreen(navController)
     //WelcomeScreen(navController)
-    //TimerScreen(navController)
+    TimerScreen(navController)
     //TimerIsRunningScreen(navController = navController)
-    StartTimeScreen(navController = navController)
+    //StartTimeScreen(navController = navController)
 }
 
 
