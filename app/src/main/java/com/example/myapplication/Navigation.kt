@@ -281,8 +281,10 @@ fun TimerIsRunningScreen(navController: NavController, setTimerDuration: Long) {
         // Timer counting down UI
         Text(
             text= String.format("%02d:%02d:%02d",hours, minutes, seconds ),
-            fontFamily = Acharnes
-            )
+            fontFamily = Acharnes,
+            fontSize = 45.sp,
+            color = if (remainingTime <= 3000) { Color.Red } else { Color.Black }
+        )
 
         Row {
             if (remainingTime.toInt() !=0) {
@@ -294,25 +296,23 @@ fun TimerIsRunningScreen(navController: NavController, setTimerDuration: Long) {
                     Text(text = "Cancel", fontFamily = Flighter)
                 }
             }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        //TODO: correct this placement
-        if (remainingTime <= 4000 && remainingTime > 0) {
-            Text("Time is running up!", fontFamily = Flighter)
-        }
-        if (remainingTime == 0L) {
-            Text(text = "Time ran up!")
-            Row {
-                Button(onClick = { remainingTime = 3L; timeIsRunning = true }) {
-                    Icon(Icons.Rounded.Refresh, contentDescription = "Restart")
-                    Text(text = "Restart Timer", fontFamily = Flighter)
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = { navController.navigate("Welcome") }) {
-                    Text(text = "Menu", fontFamily = Flighter)
+            else
+            Column(){
+                //Text(text = "Time ran up!", fontFamily = Flighter)
+                Row {
+                    Button(onClick = {navController.navigate(NavigationItem.Timer.route)}){
+                        Icon(Icons.Rounded.Refresh, contentDescription = "Restart")
+                        Text(text = "Restart Timer", fontFamily = Flighter)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(onClick = { navController.navigate("Welcome") }) {
+                        Text(text = "Menu", fontFamily = Flighter)
+                    }
                 }
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
+
     }
 }
 
