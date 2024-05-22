@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit
 @Composable
 fun StopwatchScreen(navController: NavController){
     Column(
-        modifier = Modifier.padding(40.dp),
+        modifier = Modifier.padding(10.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -52,8 +52,7 @@ fun StopwatchScreen(navController: NavController){
                 },
                 shape = CircleShape,
                 border = BorderStroke(6.dp, Color.White),
-                modifier = Modifier.size(120.dp),
-            )
+                modifier = Modifier.size(120.dp),)
             {
                 Text("Start", fontFamily = Flighter, fontSize = 23.sp)
             }

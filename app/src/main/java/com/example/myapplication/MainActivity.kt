@@ -65,6 +65,7 @@ class MainActivity : ComponentActivity() {
                                horizontalAlignment = Alignment.Start,
                         )
                         {
+                            //if (this@MainActivity != ){}
                             Text(
                                 "Latitude: $latitude",
                                 fontFamily = Montserrat,

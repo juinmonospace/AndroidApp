@@ -32,9 +32,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ui.theme.Acharnes
 import com.example.myapplication.ui.theme.Flighter
 import com.example.myapplication.ui.theme.Montserrat
@@ -61,18 +63,23 @@ fun TimerScreen(navController: NavController) {
     val milliseconds = (remainingTime % 1000) / 10
 
     Column (
-        modifier = Modifier.padding(30.dp),
+        modifier = Modifier.padding(10.dp),
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     )
     {
-        Row {
+        Spacer(modifier = Modifier.height(100.dp))
+        Row (
+            //modifier = Modifier,
+            //verticalAlignment = Alignment.CenterVertically
+        ){
             Text(text = "Hours", fontFamily = Montserrat)
-            Spacer(modifier = Modifier.width(29.dp))
+            Spacer(modifier = Modifier.width(54.dp))
             Text(text = "Minutes", fontFamily = Montserrat)
-            Spacer(modifier = Modifier.width(29.dp))
+            Spacer(modifier = Modifier.width(54.dp))
             Text(text = "Seconds", fontFamily = Montserrat)
         }
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(30.dp))
         TimePicker(
             selectedHour = selectedHour,
             onHourChange = { selectedHour = it },
@@ -81,17 +88,26 @@ fun TimerScreen(navController: NavController) {
             selectedSecond = selectedSecond,
             onSecondChange = { selectedSecond = it }
         )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = String.format("%02d:%02d:%02d", selectedHour, selectedMinute, selectedSecond),
-            fontFamily = Montserrat
-        )
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(60.dp))
+        //Text(
+          //  text = String.format("%02d:%02d:%02d", selectedHour, selectedMinute, selectedSecond),
+            //fontFamily = Montserrat
+        //)
+        //Spacer(modifier = Modifier.height(50.dp))
         Button(onClick = {
             navController.navigate("timerIsRunning/$totalTimeInMillis")
         }) {
             Icon(Icons.Rounded.PlayArrow, contentDescription = "Play")
-            Text(text = "Start", fontFamily = Flighter)
+            Text(text = "Start", fontFamily = Flighter, fontSize = 23.sp)
+        }
+        Spacer(modifier = Modifier.height(70.dp))
+        Row (
+            horizontalArrangement = Arrangement.End
+        ){
+            Spacer(modifier = Modifier.width(150.dp))
+            Button(onClick = {navController.navigate(NavigationItem.Welcome.route)}){
+                Text("Menu", fontFamily = Flighter)
+            }
         }
     }
 }
@@ -102,7 +118,6 @@ fun TimerIsRunningScreen(navController: NavController, setTimerDuration: Long) {
     var timeIsRunning by remember { mutableStateOf(true) }
     var remainingTime by remember { mutableStateOf(setTimerDuration) }
 
-
     LaunchedEffect(timeIsRunning) {
         if (timeIsRunning) {
             while (remainingTime > 0) {
@@ -112,8 +127,7 @@ fun TimerIsRunningScreen(navController: NavController, setTimerDuration: Long) {
             timeIsRunning = false //stop timer when it reaches 0
         }
     }
-
-    //compute remaining time in hours, minutes, seconds
+    //compute remaining time in hours, minutes, seconds for UI
     val hours = TimeUnit.MILLISECONDS.toHours(remainingTime)
     val minutes = TimeUnit.MILLISECONDS.toMinutes(remainingTime) % 60
     val seconds = TimeUnit.MILLISECONDS.toSeconds(remainingTime) % 60
@@ -125,7 +139,6 @@ fun TimerIsRunningScreen(navController: NavController, setTimerDuration: Long) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        //TimerRunningDisplay(remainingTime = remainingTime)
         // Timer counting down UI
         Text(
             text= String.format("%02d:%02d:%02d",hours, minutes, seconds ),
@@ -255,3 +268,12 @@ fun NumberPicker(
 }
 
 
+@Preview
+@Composable
+fun Preview(){
+    val navController : NavController = rememberNavController()
+    //WatchRunningScreen(navController)
+    //WelcomeScreen(navController)
+    TimerScreen(navController)
+    //TimerIsRunningScreen(navController = navController)
+}
