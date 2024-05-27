@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,9 +10,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -63,7 +64,7 @@ fun TimerScreen(navController: NavController) {
     val milliseconds = (remainingTime % 1000) / 10
 
     Column (
-        modifier = Modifier.padding(10.dp),
+        modifier = Modifier.padding(40.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     )
@@ -89,11 +90,6 @@ fun TimerScreen(navController: NavController) {
             onSecondChange = { selectedSecond = it }
         )
         Spacer(modifier = Modifier.height(60.dp))
-        //Text(
-          //  text = String.format("%02d:%02d:%02d", selectedHour, selectedMinute, selectedSecond),
-            //fontFamily = Montserrat
-        //)
-        //Spacer(modifier = Modifier.height(50.dp))
         Button(onClick = {
             navController.navigate("timerIsRunning/$totalTimeInMillis")
         }) {
@@ -134,11 +130,12 @@ fun TimerIsRunningScreen(navController: NavController, setTimerDuration: Long) {
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+            //.fillMaxSize()
+            .padding(40.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Spacer(modifier = Modifier.height(100.dp))
         // Timer counting down UI
         Text(
             text= String.format("%02d:%02d:%02d",hours, minutes, seconds ),
@@ -146,36 +143,51 @@ fun TimerIsRunningScreen(navController: NavController, setTimerDuration: Long) {
             fontSize = 45.sp,
             color = if (remainingTime <= 3000) { Color.Red } else { Color.Black }
         )
+        Spacer(modifier = Modifier.height(90.dp))
 
-        Row {
-            if (remainingTime.toInt() !=0) {
-                Button(onClick = { timeIsRunning = !timeIsRunning }) {
-                    Text(text = if (timeIsRunning) "Pause" else "Resume", fontFamily = Flighter)
-                }
-                Spacer(modifier = Modifier.width(8.dp))
+        //pause(stop) or resume running time
+        if (remainingTime.toInt() !=0) {
+            Button(onClick = { timeIsRunning = !timeIsRunning },
+                border = BorderStroke(6.dp, Color.White),
+                modifier = Modifier.size(120.dp),
+                ) {
+                Text(text = if (timeIsRunning) "Stop" else "Resume",
+                    fontFamily = Flighter,
+                    fontSize = 23.sp)
+            }
+            Spacer(modifier = Modifier.height(70.dp))
+            Row(
+                horizontalArrangement = Arrangement.End
+            ) {
+                Spacer(modifier = Modifier.width(150.dp))
                 Button(onClick = { navController.navigate("Timer") }) {
                     Text(text = "Cancel", fontFamily = Flighter)
                 }
             }
-            else
-                Column(){
-                    //Text(text = "Time ran up!", fontFamily = Flighter)
-                    Row {
-                        Button(onClick = {navController.navigate(NavigationItem.Timer.route)}){
-                            Icon(Icons.Rounded.Refresh, contentDescription = "Restart")
-                            Text(text = "Restart Timer", fontFamily = Flighter)
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Button(onClick = { navController.navigate("Welcome") }) {
-                            Text(text = "Menu", fontFamily = Flighter)
-                        }
-                    }
-                }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-
+        else {
+            Button(onClick = { navController.navigate(NavigationItem.Timer.route) },
+                border = BorderStroke(6.dp, Color.White),
+                modifier = Modifier.size(120.dp),
+            ) {
+                Icon(Icons.Rounded.Refresh, contentDescription = "Restart")
+                Text(text = "Restart",
+                    fontFamily = Flighter,
+                    fontSize = 23.sp)
+            }
+            Spacer(modifier = Modifier.height(90.dp))
+            Row(
+                horizontalArrangement = Arrangement.End
+            ){
+                Spacer(modifier = Modifier.width(150.dp))
+                Button(onClick = { navController.navigate("Welcome") }) {
+                Text(text = "Menu", fontFamily = Flighter) }
+            }
+        }
     }
-}
+        //Spacer(modifier = Modifier.height(16.dp))
+ }
+
 
 
 @Composable
@@ -272,8 +284,9 @@ fun NumberPicker(
 @Composable
 fun Preview(){
     val navController : NavController = rememberNavController()
+    val time : Long = 3
     //WatchRunningScreen(navController)
     //WelcomeScreen(navController)
-    TimerScreen(navController)
-    //TimerIsRunningScreen(navController = navController)
+    //TimerScreen(navController)
+    TimerIsRunningScreen(navController = navController, setTimerDuration = time)
 }
