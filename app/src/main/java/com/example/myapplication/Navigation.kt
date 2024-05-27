@@ -36,7 +36,7 @@ fun Navigation(){
             StopwatchScreen(navController = navController)
         }
         composable(route = Screen.WATCHRUNNING.name){
-            WatchRunningScreen(navController = navController)
+            StopwatchRunningScreen(navController = navController)
         }
         composable(route = Screen.TIMER.name){
             TimerScreen(navController = navController)

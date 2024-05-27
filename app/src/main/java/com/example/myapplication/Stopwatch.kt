@@ -5,12 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -35,44 +32,37 @@ import java.util.concurrent.TimeUnit
 @Composable
 fun StopwatchScreen(navController: NavController){
     Column(
-        modifier = Modifier.padding(10.dp),
+        modifier = Modifier.padding(40.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(80.dp))
         //time ui
         StopWatchDisplay(elapsedTime = 0)
-        Spacer(modifier = Modifier.padding(60.dp))
-        Column(
-            modifier = Modifier.padding(40.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Button(
-                onClick = {
-                    navController.navigate(NavigationItem.WatchRunning.route)
-                },
+        Spacer(modifier = Modifier.padding(50.dp))
+        Button(
+            onClick = {
+                navController.navigate(NavigationItem.WatchRunning.route) },
                 shape = CircleShape,
                 border = BorderStroke(6.dp, Color.White),
                 modifier = Modifier.size(120.dp),)
             {
                 Text("Start", fontFamily = Flighter, fontSize = 23.sp)
             }
-            Spacer(modifier = Modifier.height(50.dp))
-            Row (
-                horizontalArrangement = Arrangement.End
-            ){
-                Spacer(modifier = Modifier.width(100.dp))
-                Button(onClick = { navController.navigate(NavigationItem.Welcome.route) }) {
-                    Text(text = "Menu", fontFamily = Flighter)
-                }
+        Spacer(modifier = Modifier.height(50.dp))
+        Row (
+            horizontalArrangement = Arrangement.End
+        ){
+            Spacer(modifier = Modifier.weight(1f))
+            Button(onClick = { navController.navigate(NavigationItem.Welcome.route) }) {
+                Text(text = "Menu", fontFamily = Flighter)
             }
         }
-
     }
-
 }
 
 @Composable
-fun WatchRunningScreen(navController: NavController){
+fun StopwatchRunningScreen(navController: NavController){
     var passedTime by remember { mutableStateOf(0L) }
     var timeIsRunning by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
@@ -88,14 +78,14 @@ fun WatchRunningScreen(navController: NavController){
 
     Column(
         modifier = Modifier
-            .padding(40.dp)
-            .fillMaxSize(),
+            .padding(40.dp),
+            //.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(80.dp))
         StopWatchDisplay(elapsedTime = passedTime)
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.padding(50.dp))
         Button(
             border = BorderStroke(6.dp, Color.White),
             modifier = Modifier.size(120.dp),
@@ -110,17 +100,17 @@ fun WatchRunningScreen(navController: NavController){
         Spacer(modifier = Modifier.height(50.dp))
         Row(
             horizontalArrangement = Arrangement.End,
-            modifier = Modifier.fillMaxWidth()
+            //modifier = Modifier.fillMaxWidth()
         ) {
             Spacer(modifier = Modifier.weight(1f))
             Button(
-                border = BorderStroke(6.dp, Color.White),
+                //border = BorderStroke(6.dp, Color.White),
                 onClick = {
                     timeIsRunning = false
                     navController.navigate(NavigationItem.Stopwatch.route)
                 }
             ) {
-                Text("Reset", fontFamily = Flighter, fontSize = 23.sp)
+                Text("Reset", fontFamily = Flighter)
             }
         }
     }
