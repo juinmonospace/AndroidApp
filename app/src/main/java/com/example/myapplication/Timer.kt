@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.media.MediaPlayer
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,14 +17,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,12 +32,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.ui.theme.Acharnes
 import com.example.myapplication.ui.theme.Flighter
 import com.example.myapplication.ui.theme.Montserrat
 import kotlinx.coroutines.delay
@@ -70,15 +69,12 @@ fun TimerScreen(navController: NavController) {
     )
     {
         Spacer(modifier = Modifier.height(100.dp))
-        Row (
-            //modifier = Modifier,
-            //verticalAlignment = Alignment.CenterVertically
-        ){
-            Text(text = "Hours", fontFamily = Montserrat)
-            Spacer(modifier = Modifier.width(54.dp))
-            Text(text = "Minutes", fontFamily = Montserrat)
-            Spacer(modifier = Modifier.width(54.dp))
-            Text(text = "Seconds", fontFamily = Montserrat)
+        Row {
+            Text(text = "Hours", fontFamily = Montserrat, fontSize = 12.sp)
+            Spacer(modifier = Modifier.width(53.dp))
+            Text(text = "Minutes", fontFamily = Montserrat,fontSize = 12.sp)
+            Spacer(modifier = Modifier.width(46.dp))
+            Text(text = "Seconds", fontFamily = Montserrat,fontSize = 12.sp)
         }
         Spacer(modifier = Modifier.height(30.dp))
         TimePicker(
@@ -91,9 +87,12 @@ fun TimerScreen(navController: NavController) {
         )
         Spacer(modifier = Modifier.height(60.dp))
         Button(onClick = {
-            navController.navigate("timerIsRunning/$totalTimeInMillis")
-        }) {
-            Icon(Icons.Rounded.PlayArrow, contentDescription = "Play")
+            navController.navigate("timerIsRunning/$totalTimeInMillis")},
+            shape = CircleShape,
+            border = BorderStroke(6.dp, Color.White),
+            modifier = Modifier.size(120.dp)
+        ) {
+            //Icon(Icons.Rounded.PlayArrow, contentDescription = "Play")
             Text(text = "Start", fontFamily = Flighter, fontSize = 23.sp)
         }
         Spacer(modifier = Modifier.height(70.dp))
@@ -111,13 +110,25 @@ fun TimerScreen(navController: NavController) {
 
 @Composable
 fun TimerIsRunningScreen(navController: NavController, setTimerDuration: Long) {
+    val context = LocalContext.current
     var timeIsRunning by remember { mutableStateOf(true) }
     var remainingTime by remember { mutableStateOf(setTimerDuration) }
+    var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
+
+    //play duck sound as alarm
+    DisposableEffect(Unit) {
+        mediaPlayer = MediaPlayer.create(context, R.raw.duck).apply {
+            isLooping = true
+        }
+        onDispose {
+            mediaPlayer?.release()
+        }
+    }
 
     LaunchedEffect(timeIsRunning) {
         if (timeIsRunning) {
             while (remainingTime > 0) {
-                delay(1000L) // Delay for 1 second
+                delay(1000L) // delay for 1 second
                 remainingTime -= 1000L
             }
             timeIsRunning = false //stop timer when it reaches 0
@@ -127,10 +138,11 @@ fun TimerIsRunningScreen(navController: NavController, setTimerDuration: Long) {
     val hours = TimeUnit.MILLISECONDS.toHours(remainingTime)
     val minutes = TimeUnit.MILLISECONDS.toMinutes(remainingTime) % 60
     val seconds = TimeUnit.MILLISECONDS.toSeconds(remainingTime) % 60
+    val milliseconds = (remainingTime % 1000) / 10
+
 
     Column(
         modifier = Modifier
-            //.fillMaxSize()
             .padding(40.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -139,7 +151,7 @@ fun TimerIsRunningScreen(navController: NavController, setTimerDuration: Long) {
         // Timer counting down UI
         Text(
             text= String.format("%02d:%02d:%02d",hours, minutes, seconds ),
-            fontFamily = Acharnes,
+            fontFamily = Montserrat,
             fontSize = 45.sp,
             color = if (remainingTime <= 3000) { Color.Red } else { Color.Black }
         )
@@ -149,7 +161,7 @@ fun TimerIsRunningScreen(navController: NavController, setTimerDuration: Long) {
         if (remainingTime.toInt() !=0) {
             Button(onClick = { timeIsRunning = !timeIsRunning },
                 border = BorderStroke(6.dp, Color.White),
-                modifier = Modifier.size(120.dp),
+                //modifier = Modifier.size(120.dp),
                 ) {
                 Text(text = if (timeIsRunning) "Stop" else "Resume",
                     fontFamily = Flighter,
@@ -165,12 +177,17 @@ fun TimerIsRunningScreen(navController: NavController, setTimerDuration: Long) {
                 }
             }
         }
+        // time ran up
         else {
-            Button(onClick = { navController.navigate(NavigationItem.Timer.route) },
+            mediaPlayer?.start()
+            Button(onClick = {
+                navController.navigate(NavigationItem.Timer.route)
+                mediaPlayer?.stop()
+            },
                 border = BorderStroke(6.dp, Color.White),
-                modifier = Modifier.size(120.dp),
+                //modifier = Modifier.size(120.dp),
             ) {
-                Icon(Icons.Rounded.Refresh, contentDescription = "Restart")
+                //Icon(Icons.Rounded.Refresh, contentDescription = "Restart")
                 Text(text = "Restart",
                     fontFamily = Flighter,
                     fontSize = 23.sp)
@@ -180,7 +197,10 @@ fun TimerIsRunningScreen(navController: NavController, setTimerDuration: Long) {
                 horizontalArrangement = Arrangement.End
             ){
                 Spacer(modifier = Modifier.width(150.dp))
-                Button(onClick = { navController.navigate("Welcome") }) {
+                Button(onClick = {
+                    navController.navigate("Welcome")
+                    mediaPlayer?.stop()
+                }) {
                 Text(text = "Menu", fontFamily = Flighter) }
             }
         }
@@ -246,8 +266,6 @@ fun NumberPicker(
             .height(130.dp)
             .width(80.dp)
             .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp)),
-        //.background(Color.White)
-        //.border(1.dp, Color.Gray)
     ) {
         LazyColumn(
             contentPadding = PaddingValues(vertical = 30.dp),
@@ -261,7 +279,7 @@ fun NumberPicker(
                     text = item.toString(),
                     fontSize = 28.sp,
                     color = if (item == selectedNumber) Color.Black else Color.LightGray,
-                    fontFamily = Acharnes,
+                    fontFamily = Montserrat,
                     modifier = Modifier
                         .padding(8.dp)
                         .clickable { onNumberChange(item) }
@@ -287,6 +305,6 @@ fun Preview(){
     val time : Long = 3
     //WatchRunningScreen(navController)
     //WelcomeScreen(navController)
-    //TimerScreen(navController)
-    TimerIsRunningScreen(navController = navController, setTimerDuration = time)
+    TimerScreen(navController)
+   //TimerIsRunningScreen(navController = navController, setTimerDuration = time)
 }

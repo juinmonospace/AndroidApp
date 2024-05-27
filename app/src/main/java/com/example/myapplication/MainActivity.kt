@@ -1,11 +1,8 @@
 package com.example.myapplication
 
-//import java.lang.reflect.Modifier
-//import androidx.lifecycle.asLiveData
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -35,7 +32,6 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 
 class MainActivity : ComponentActivity() {
@@ -50,7 +46,7 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf("")
             }
             val (longitude, setLongitude) = remember { mutableStateOf("") }
-            val (address, setAddress) = remember { mutableStateOf("") }
+            //val (address, setAddress) = remember { mutableStateOf("") }
 
 
             MyApplicationTheme {
@@ -88,11 +84,8 @@ class MainActivity : ComponentActivity() {
                         fusedLocationProviderClient =
                             LocationServices.getFusedLocationProviderClient(this@MainActivity)
                         checkAndRequestPermissions(setLatitude, setLongitude)
-                        //getAddressLocation(latitude.toDouble(), longitude.toDouble(), setAddress)
-
-
-                    }
-                }
+        }
+    }
 
 
     private fun checkAndRequestPermissions(
@@ -175,44 +168,8 @@ class MainActivity : ComponentActivity() {
                         .addOnFailureListener { exception ->
                             Log.e("MainActivity", "Error getting location", exception)
                         }
-
-
                 }
-
-
-                // get address (city, country) based on current location
-                fun getAddressLocation(
-                    latitude: Double,
-                    longitude: Double,
-                    setAddress: (String) -> Unit
-                ) {
-                    val geocoderLocation = GeocoderLocation(this@MainActivity)
-                    val locationInfo = geocoderLocation.getAddress(latitude, longitude)
-                    setAddress(locationInfo)
-                }
-
             }
-
-
-
-class GeocoderLocation(private val context: Context) {
-    fun getAddress(latitude: Double, longitude: Double): String {
-        val geocoder = Geocoder(context, Locale.getDefault())
-        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
-        if (addresses != null) {
-            return if (addresses.isNotEmpty()) {
-                val address = addresses[0]
-                val city = address.locality ?: ""
-                val country = address.countryName ?: ""
-                "$city, $country"
-            } else {
-                "No location found"
-            }
-        }
-        return "No location found."
-    }
-}
-
 
 
 @Preview(showBackground = true)

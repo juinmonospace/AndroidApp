@@ -5,7 +5,6 @@ enum class Screen{
     WELCOME,
     WATCHRUNNING,
     TIMER,
-    TIMERISRUNNING
 }
 
 sealed class NavigationItem(val route: String){
@@ -13,15 +12,5 @@ sealed class NavigationItem(val route: String){
     object Stopwatch : NavigationItem("stopwatch")
     object WatchRunning: NavigationItem("watchRunning")
     object Timer : NavigationItem("timer")
-    object TimerIsRunning : NavigationItem("timerIsRunning")
-    //arguments = listOf(navArgument("remainingTime") { type = NavType.LongType })
 
-    fun withArgs(vararg args: String): String{
-        return buildString {
-            append(route)
-            args.forEach { arg ->
-                append("/$arg")
-            }
-        }
-    }
 }

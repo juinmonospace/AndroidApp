@@ -21,7 +21,9 @@ val Montserrat = FontFamily(
     Font(R.font.montserratlight)
 )
 
-
+val Ubuntu = FontFamily(
+    Font(R.font.ubuntu)
+)
 // Set of Material typography styles to start with
 val Typography = Typography(
 

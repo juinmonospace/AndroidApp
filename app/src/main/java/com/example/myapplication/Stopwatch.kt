@@ -24,8 +24,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.myapplication.ui.theme.Acharnes
 import com.example.myapplication.ui.theme.Flighter
+import com.example.myapplication.ui.theme.Montserrat
 import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
 
@@ -36,16 +36,16 @@ fun StopwatchScreen(navController: NavController){
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(90.dp))
         //time ui
         StopWatchDisplay(elapsedTime = 0)
-        Spacer(modifier = Modifier.padding(50.dp))
+        Spacer(modifier = Modifier.padding(30.dp))
         Button(
             onClick = {
                 navController.navigate(NavigationItem.WatchRunning.route) },
                 shape = CircleShape,
                 border = BorderStroke(6.dp, Color.White),
-                modifier = Modifier.size(120.dp),)
+                modifier = Modifier.size(120.dp))
             {
                 Text("Start", fontFamily = Flighter, fontSize = 23.sp)
             }
@@ -79,16 +79,14 @@ fun StopwatchRunningScreen(navController: NavController){
     Column(
         modifier = Modifier
             .padding(40.dp),
-            //.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(70.dp))
         StopWatchDisplay(elapsedTime = passedTime)
         Spacer(modifier = Modifier.padding(50.dp))
         Button(
             border = BorderStroke(6.dp, Color.White),
-            modifier = Modifier.size(120.dp),
             onClick = { timeIsRunning = !timeIsRunning }
         ) {
             if (timeIsRunning) {
@@ -100,11 +98,9 @@ fun StopwatchRunningScreen(navController: NavController){
         Spacer(modifier = Modifier.height(50.dp))
         Row(
             horizontalArrangement = Arrangement.End,
-            //modifier = Modifier.fillMaxWidth()
         ) {
             Spacer(modifier = Modifier.weight(1f))
             Button(
-                //border = BorderStroke(6.dp, Color.White),
                 onClick = {
                     timeIsRunning = false
                     navController.navigate(NavigationItem.Stopwatch.route)
@@ -119,7 +115,6 @@ fun StopwatchRunningScreen(navController: NavController){
 
 @Composable
 fun StopWatchDisplay(elapsedTime: Long) {
-    //val hours = TimeUnit.MILLISECONDS.toHours(elapsedTime)
     val minutes = TimeUnit.MILLISECONDS.toMinutes(elapsedTime) % 60
     val seconds = TimeUnit.MILLISECONDS.toSeconds(elapsedTime) % 60
     val milliseconds = (elapsedTime % 1000) / 10
@@ -127,7 +122,7 @@ fun StopWatchDisplay(elapsedTime: Long) {
     val formattedTime = String.format("%02d:%02d:%02d", minutes, seconds, milliseconds)
     Text(
         text = formattedTime,
-        fontFamily = Acharnes,
+        fontFamily = Montserrat,
         fontSize = 45.sp,
     )
 }
