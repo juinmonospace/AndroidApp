@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.media.MediaPlayer
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -180,6 +181,7 @@ fun TimerIsRunningScreen(navController: NavController, setTimerDuration: Long) {
         // time ran up
         else {
             mediaPlayer?.start()
+            Toast.makeText(context, "Timer ended", Toast.LENGTH_SHORT).show()
             Button(onClick = {
                 navController.navigate(NavigationItem.Timer.route)
                 mediaPlayer?.stop()
